@@ -1,26 +1,20 @@
-version: "3.8"
-
 services:
   blockchain:
     image: trufflesuite/ganache
     container_name: local-blockchain
     ports:
       - "8545:8545"
-    command: >
-      ganache
-      --host 0.0.0.0
-      --port 8545
-      --deterministic
-      --accounts 10
-      --balance 1000
 
   deployer:
-    build: .
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
     container_name: vault-deployer
     depends_on:
-      - blockchain
+      blockchain:
+        condition: service_started
     environment:
-      - HARDHAT_NETWORK=localhost
+      HARDHAT_NETWORK: localhost
     volumes:
       - .:/app
     command: sh ./docker/entrypoint.sh
